@@ -1,11 +1,8 @@
-FROM node:20-alpine
-RUN npm install -g npm@latest
-RUN addgroup -S appuser && adduser -S -G appuser -h /home/appuser -s /sbin/nologin appuser
+FROM cgr.dev/chainguard/node
+ENV NODE_ENV=production
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --only=production && npm cache clean --force
-COPY . .
-RUN chown -R appuser:appuser /app
-USER appuser
+COPY --chown=node:node package*.json ./
+RUN npm install --omit-dev
+COPY --chown=node:node . .
 EXPOSE 8080
-CMD ["node", "server.js"]
+CMD ["server.js"]
